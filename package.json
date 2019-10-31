@@ -1,5 +1,5 @@
 {
-  "name": "openid-client",
+  "name": "@gmsllc/openid-client",
   "version": "2.5.0",
   "description": "OpenID Connect Relying Party (RP, Client) implementation for Node.js servers, supports passportjs",
   "keywords": [
@@ -24,13 +24,14 @@
     "relying",
     "strategy"
   ],
-  "homepage": "https://github.com/panva/node-openid-client",
-  "repository": "panva/node-openid-client",
+  "homepage": "https://github.com/gmsllc/node-openid-client",
+  "repository": "gmsllc/node-openid-client",
   "license": "MIT",
   "author": "Filip Skokan <panva.ip@gmail.com>",
   "files": [
     "lib"
   ],
+  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
   "main": "lib/index.js",
   "scripts": {
     "coverage": "nyc mocha",
