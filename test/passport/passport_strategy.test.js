@@ -74,6 +74,26 @@ const { Issuer, Strategy } = require('../../lib');
         expect(req.session['oidc:op.example.com']).to.have.keys('state', 'response_type');
       });
 
+      it('starts authentication and waits for session save before redirect', function () {
+        const strategy = new Strategy({ client: this.client }, () => {});
+
+        const req = new MockRequest('GET', '/login/oidc');
+        req.session = {
+          save: sinon.stub().yields()
+        };
+
+        strategy.redirect = sinon.spy();
+        strategy.authenticate(req);
+
+        expect(strategy.redirect.calledOnce).to.be.true;
+        const target = strategy.redirect.firstCall.args[0];
+        expect(target).to.include('redirect_uri=');
+        expect(target).to.include('scope=');
+        expect(req.session).to.have.property('oidc:op.example.com');
+        expect(req.session['oidc:op.example.com']).to.have.keys('state', 'response_type');
+        expect(req.session.save.calledOnce).to.be.true;
+      });
+
       it('starts authentication requests for POSTs', function () {
         const strategy = new Strategy({ client: this.client }, () => {});
 
