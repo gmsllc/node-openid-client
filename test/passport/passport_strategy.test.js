@@ -10,6 +10,8 @@ const { Issuer, Strategy } = require('../../lib');
   describe(`OpenIDConnectStrategy - using ${httpProvider.substring(3).toLowerCase()}`, function () {
     before(function () {
       Issuer[httpProvider]();
+      global._setTimeout = global.setTimeout;
+      global.setTimeout = cb => cb();
     });
 
     before(function () {
@@ -19,6 +21,7 @@ const { Issuer, Strategy } = require('../../lib');
 
     after(function () {
       http.IncomingMessage = this.origIncomingMessage;
+      global.setTimeout = global._setTimeout;
     });
 
     beforeEach(function () {

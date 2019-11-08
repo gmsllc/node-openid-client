@@ -31,7 +31,9 @@
   "files": [
     "lib"
   ],
-  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "main": "lib/index.js",
   "scripts": {
     "coverage": "nyc mocha",

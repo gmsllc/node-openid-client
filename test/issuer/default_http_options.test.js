@@ -9,7 +9,7 @@ describe('Issuer#defaultHttpOptions', function () {
 
   it('includes a user-agent by default', function () {
     expect(Issuer.defaultHttpOptions).to.have.nested.property('headers.User-Agent')
-      .to.match(/^openid-client/);
+      .to.match(/openid-client/);
   });
 
   it('does not retry', function () {
@@ -38,7 +38,7 @@ describe('Issuer#defaultHttpOptions=', function () {
   it('can be set to send more headers by default', function () {
     Issuer.defaultHttpOptions = { headers: { 'X-Meta-Id': 'meta meta' } };
     expect(Issuer.defaultHttpOptions).to.have.nested.property('headers.User-Agent')
-      .to.match(/^openid-client/);
+      .to.match(/openid-client/);
     expect(Issuer.defaultHttpOptions).to.have.nested.property('headers.X-Meta-Id', 'meta meta');
   });
 
