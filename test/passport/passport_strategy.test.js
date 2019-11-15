@@ -94,6 +94,26 @@ const { Issuer, Strategy } = require('../../lib');
         expect(req.session.save.calledOnce).to.be.true;
       });
 
+      it('should store auto-login session separately', function () {
+        const strategy = new Strategy({ client: this.client }, () => {});
+        const req = new MockRequest('GET', '/login/oidc?invisible=true');
+        req.session = {
+            save: sinon.stub().yields()
+        };
+
+        strategy.redirect = sinon.spy();
+        strategy.authenticate(req);
+
+        expect(strategy.redirect.calledOnce).to.be.true;
+        const target = strategy.redirect.firstCall.args[0];
+        expect(target).to.include('redirect_uri=');
+        expect(target).to.include('scope=');
+        expect(target).to.match(/state=[^|]+|auto/);
+        expect(req.session).to.have.property('oidc:op.example.com-auto');
+        expect(req.session['oidc:op.example.com-auto']).to.have.keys('state', 'response_type');
+        expect(req.session.save.calledOnce).to.be.true;
+      });
+
       it('starts authentication requests for POSTs', function () {
         const strategy = new Strategy({ client: this.client }, () => {});
 
@@ -293,6 +313,32 @@ const { Issuer, Strategy } = require('../../lib');
 
         strategy.authenticate(req);
       });
+
+      it('triggers the verify function and then the success one using auto-login state', function (next) {
+        const ts = { foo: 'bar' };
+        sinon.stub(this.client, 'authorizationCallback').callsFake(function () {
+          return Promise.resolve(ts);
+        });
+
+        const strategy = new Strategy({ client: this.client }, (tokenset, done) => {
+          expect(tokenset).to.equal(ts);
+          done(null, tokenset);
+        });
+
+        strategy.success = () => { next(); };
+
+        const req = new MockRequest('GET', '/login/oidc/callback?code=foobar&state=state|auto');
+        req.session = {
+          'oidc:op.example.com-auto': {
+            nonce: 'nonce',
+            state: 'state|auto',
+            response_type: 'code',
+          },
+        };
+
+        strategy.authenticate(req);
+      });
+
 
       it('triggers the error function when server_error is encountered', function (next) {
         const strategy = new Strategy({ client: this.client }, () => {});
